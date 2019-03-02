@@ -46,6 +46,9 @@ app.get('/', function (req, res) {
 			title: 'hello world',
 			cameras: camera
 		});
+		camera.takePicture({download: true}, function (er, data) {
+			fs.writeFileSync(__dirname + '/picture.jpg', data);
+		  });
 	});
 });
 

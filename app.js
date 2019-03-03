@@ -63,9 +63,21 @@ app.post('/', function (req, res) { //this starts recording
 				dateObj = new Date(); // get new date
 				var filename_year = dateObj.getUTCFullYear();
 				var filename_month = dateObj.getUTCMonth() + 1;
+				if (filename_month < 10) {
+					filename_month = `0${filename_month}`
+				};
 				var filename_day = dateObj.getUTCDate();
+				if (filename_day < 10) {
+					filename_day = `0${filename_day}`
+				};
 				var filename_hour = dateObj.getUTCHours();
+				if (filename_hour < 10) {
+					filename_hour = `0${filename_hour}`
+				};
 				var filename_min = dateObj.getUTCMinutes();
+				if (filename_min < 10) {
+					filename_min = `0${filename_min}`
+				};
 				var filename_sec = dateObj.getUTCSeconds();
 				if (filename_sec < 10) {
 					filename_sec = `0${filename_sec}`

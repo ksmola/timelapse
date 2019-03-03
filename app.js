@@ -72,10 +72,10 @@ app.post('/', function (req, res) { //this starts recording
 				};
 					var filename_date = `${filename_year}${filename_month}${filename_day}${filename_hour}${filename_min}${filename_sec}`;
 					console.log('filename: ', filename_date);
-					fs.writeFileSync('/home/pi/Pictures/' + filename_date + '.jpg', data); //TODO make this a dropdown menu
+					fs.writeFileSync('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data); //TODO make this a dropdown menu
 			});
 		}; 
-		setInterval(() => getPicture(), interval * 1000);
+		setInterval(() => getPicture(), interval * 1000); //TODO limit interval to 4 seconds? 
 	}
 	else {
 		console.log("no camera found!");

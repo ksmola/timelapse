@@ -93,6 +93,8 @@ app.post('/', function (req, res) { //this starts recording
 		console.log("no camera found!");
 	}
 	res.render('index', {
+		message: 'recording started',
+		interval: interval,
 		cameras: camera
 	});
 });

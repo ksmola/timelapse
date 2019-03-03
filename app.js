@@ -57,9 +57,9 @@ app.post('/', function (req, res) { //this starts recording
 	var interval = req.body.interval;
 	console.log(typeof camera);
 	if (typeof camera !== 'undefined' && camera.length > 0) {
-		camera[0].takePicture({ download: true }, function (er, data) {
+		function getPicture() {
+			camera[0].takePicture({ download: true }, function (er, data) {
 
-			function getPicture(er, data) {
 				dateObj = new Date(); // get new date
 				var filename_year = dateObj.getUTCFullYear();
 				var filename_month = dateObj.getUTCMonth() + 1;
@@ -69,15 +69,13 @@ app.post('/', function (req, res) { //this starts recording
 				var filename_sec = dateObj.getUTCSeconds();
 				if (filename_sec < 10) {
 					filename_sec = `0${filename_sec}`
-				}
-
-				var filename_date = `${filename_year}${filename_month}${filename_day}${filename_hour}${filename_min}${filename_sec}`;
-				console.log('filename: ', filename_date);
-				fs.writeFileSync('/home/pi/Pictures/' + filename_date + '.jpg', data); //TODO make this a dropdown menu
-			};
-
-			setInterval(() => getPicture(), interval * 1000);
-		});
+				};
+					var filename_date = `${filename_year}${filename_month}${filename_day}${filename_hour}${filename_min}${filename_sec}`;
+					console.log('filename: ', filename_date);
+					fs.writeFileSync('/home/pi/Pictures/' + filename_date + '.jpg', data); //TODO make this a dropdown menu
+			});
+		}; 
+		setInterval(() => getPicture(), interval * 1000);
 	}
 	else {
 		console.log("no camera found!");

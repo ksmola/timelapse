@@ -41,6 +41,7 @@ app.get('/', function (req, res) {
 			list[0] = {model: "no camera found"};
 		}
 		var camera = list[0];
+		console.log(camera);
 		console.log('found: ', camera.model);
 		res.render('index', {
 			title: 'hello world',

@@ -50,7 +50,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //Routes
 app.get('/', function (req, res) {
 	console.log('Month: ' + dateObj.getMonth() + ' Day: ' + dateObj.getUTCDate() + ' Year: ' + dateObj.getFullYear());
-	res.render('/home/pi/timelapse/index', {
+	res.render('index', {
 		cameras: camera,
 		message: message,
 		interval: interval
@@ -102,7 +102,7 @@ app.post('/', function (req, res) { //this starts recording
 	else {
 		console.log("no camera found!");
 	}
-	res.render('/home/pi/timelapse/index', {
+	res.render('index', {
 		message: message,
 		interval: interval,
 		cameras: camera
@@ -115,7 +115,7 @@ app.post('/stop', function (req, res) {
 	error = 'Recording stopped';
 	message = null;
 	interval = null;
-	res.render('/home/pi/timelapse/index', {
+	res.render('index', {
 		error: error,
 		cameras: camera
 	});

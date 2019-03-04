@@ -16,6 +16,10 @@ var dateObj = new Date();
 
 let camera = undefined;
 
+let message = undefined;
+let interval = undefined;
+let intervalID = undefined;
+
 GPhoto.setLogLevel(1);
 GPhoto.on('log', function (level, domain, message) {
 	console.log(domain, message);
@@ -47,15 +51,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', function (req, res) {
 	console.log('Month: ' + dateObj.getMonth() + ' Day: ' + dateObj.getUTCDate() + ' Year: ' + dateObj.getFullYear());
 	res.render('index', {
-		cameras: camera
+		cameras: camera,
+		message: message,
+		interval: interval
 	});
 });
 
 app.post('/', function (req, res) { //this starts recording
-	// console.log(req.body);
 	console.log('start!');
-	var interval = req.body.interval;
+	error = null;
+	interval = req.body.interval;
+	if (interval < 5) {
+		interval = 5;
+	}
 	console.log(typeof camera);
+	message = 'Recording Active!';
 	if (typeof camera !== 'undefined' && camera.length > 0) {
 		function getPicture() {
 			camera[0].takePicture({ download: true }, function (er, data) {
@@ -82,19 +92,31 @@ app.post('/', function (req, res) { //this starts recording
 				if (filename_sec < 10) {
 					filename_sec = `0${filename_sec}`
 				};
-					var filename_date = `${filename_year}${filename_month}${filename_day}${filename_hour}${filename_min}${filename_sec}`;
-					console.log('filename: ', filename_date);
-					fs.writeFileSync('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data); //TODO make this a dropdown menu
+				var filename_date = `${filename_year}${filename_month}${filename_day}${filename_hour}${filename_min}${filename_sec}`;
+				console.log('filename: ', filename_date);
+				fs.writeFileSync('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data); //TODO make this a dropdown menu
 			});
-		}; 
-		setInterval(() => getPicture(), interval * 1000); //TODO limit interval to 4 seconds? 
+		};
+		intervalID = setInterval(() => getPicture(), interval * 1000); //TODO limit interval to 4 seconds? 
 	}
 	else {
 		console.log("no camera found!");
 	}
 	res.render('index', {
-		message: 'recording started',
+		message: message,
 		interval: interval,
+		cameras: camera
+	});
+});
+
+app.post('/stop', function (req, res) {
+	console.log('stop');
+	clearInterval(intervalID);
+	error = 'Recording stopped';
+	message = null;
+	interval = null;
+	res.render('index', {
+		error: error,
 		cameras: camera
 	});
 });

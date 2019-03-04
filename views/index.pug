@@ -30,6 +30,9 @@ html(lang='en')
       button.btn.btn-dark(type='submit') Start 
     form(action='/stop', method="POST")
       button.btn.btn-danger.mt-2(type='submit') Stop
+    if image
+      img.text-center.form-control.image(src='/#{image}, width='360px')
+
 
 
     // Optional JavaScript

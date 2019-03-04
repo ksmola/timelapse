@@ -19,6 +19,7 @@ let camera = undefined;
 let message = undefined;
 let interval = undefined;
 let intervalID = undefined;
+let lastimage = undefined;
 
 GPhoto.setLogLevel(1);
 GPhoto.on('log', function (level, domain, message) {
@@ -53,7 +54,8 @@ app.get('/', function (req, res) {
 	res.render('index', {
 		cameras: camera,
 		message: message,
-		interval: interval
+		interval: interval,
+		image: lastimage
 	});
 });
 
@@ -65,7 +67,7 @@ app.post('/', function (req, res) { //this starts recording
 		interval = 5;
 	}
 	console.log(typeof camera);
-	message = 'Recording Active!\nInterval: ' + interval + ' s';
+	message = 'Recording Active! Interval: ' + interval + ' s';
 	if (typeof camera !== 'undefined' && camera.length > 0) {
 		function getPicture() {
 			camera[0].takePicture({ download: true }, function (er, data) {
@@ -95,6 +97,7 @@ app.post('/', function (req, res) { //this starts recording
 				var filename_date = `${filename_year}${filename_month}${filename_day}${filename_hour}${filename_min}${filename_sec}`;
 				console.log('filename: ', filename_date);
 				fs.writeFileSync('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data); //TODO make this a dropdown menu
+				lastimage = '/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg';
 			});
 		};
 		intervalID = setInterval(() => getPicture(), interval * 1000); //TODO limit interval to 4 seconds? 
@@ -105,7 +108,8 @@ app.post('/', function (req, res) { //this starts recording
 	res.render('index', {
 		message: message,
 		interval: interval,
-		cameras: camera
+		cameras: camera, 
+		image: lastimage
 	});
 });
 

@@ -65,7 +65,7 @@ app.post('/', function (req, res) { //this starts recording
 		interval = 5;
 	}
 	console.log(typeof camera);
-	message = 'Recording Active!';
+	message = 'Recording Active!\nInterval: ' + interval + ' s';
 	if (typeof camera !== 'undefined' && camera.length > 0) {
 		function getPicture() {
 			camera[0].takePicture({ download: true }, function (er, data) {

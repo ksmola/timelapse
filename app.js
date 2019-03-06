@@ -70,6 +70,9 @@ app.post('/', function (req, res) { //this starts recording
 	message = 'Recording Active! Interval: ' + interval + ' s';
 	if (typeof camera !== 'undefined' && camera.length > 0) {
 		function getPicture() {
+			GPhoto.list(function (cameras) {
+				camera = cameras;
+			});			
 			camera[0].takePicture({ download: true }, function (er, data) {
 
 				dateObj = new Date(); // get new date

@@ -75,10 +75,72 @@ app.post('/', function (req, res) { //this starts recording
 	if (typeof camera !== 'undefined' && camera.length > 0) {
 		function getPicture() {
 			camera[0].takePicture({
-				download: false, 
+				download: true, 
 				keep: true
-			}, function (er, path) {
-				console.log(path);
+			 }, function (er, data) {
+
+				dateObj = new Date(); // get new date
+				var filename_year = dateObj.getUTCFullYear();
+				var filename_month = dateObj.getUTCMonth() + 1;
+				if (filename_month < 10) {
+					filename_month = `0${filename_month}`
+				};
+				var filename_day = dateObj.getUTCDate();
+				if (filename_day < 10) {
+					filename_day = `0${filename_day}`
+				};
+				var filename_hour = dateObj.getUTCHours();
+				if (filename_hour < 10) {
+					filename_hour = `0${filename_hour}`
+				};
+				var filename_min = dateObj.getUTCMinutes();
+				if (filename_min < 10) {
+					filename_min = `0${filename_min}`
+				};
+				var filename_sec = dateObj.getUTCSeconds();
+				if (filename_sec < 10) {
+					filename_sec = `0${filename_sec}`
+				};
+				var filename_date = `${filename_year}${filename_month}${filename_day}${filename_hour}${filename_min}${filename_sec}`;
+				console.log('filename: ', filename_date);
+				latestimage = '/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg';
+				var usbPath = '/dev/bus/usb/' + usbport[1] + '/' + usbport[2];
+				fs.writeFile('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data, (err) => {
+					if (err) {			//handle file system errors
+						console.log('Error writing file, ', err);
+					} else {
+						var fileSizeInBytes = fs.statSync(latestimage)["size"];
+						var fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
+						console.log('Size of ' + filename_date + ': ' + fileSizeInMegabytes + 'mb');
+
+						if (fileSizeInBytes < 1000) {
+
+							fs.unlink('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', (err) => {
+								if (err) throw err;
+								console.log('successfully deleted ', filename_date);
+							  });
+
+							exec('usbreset ' + usbPath, function (err, stdout, stderr) {
+
+								if (stderr || stdout) {
+									console.log('stdout: ' + stdout);
+									console.log('stderr: ' + stderr);
+								}
+
+								else if (err !== null) {
+									// crash if we can't get going again
+									console.log('usbreset exec error: ' + err);
+
+								}
+
+								else {
+									console.log("usbreset successfull");
+								}
+
+							});
+						};
+					}
+				});
 
 			});
 		};

@@ -5,6 +5,7 @@ var pug = require('pug');
 var fs = require('fs');
 var gphoto2 = require('gphoto2');
 var GPhoto = new gphoto2.GPhoto2();
+var exec = require('child_process').exec;
 
 var SegfaultHandler = require('segfault-handler'); // for debugging only
 SegfaultHandler.registerHandler("crash.log");
@@ -101,7 +102,7 @@ app.post('/', function (req, res) { //this starts recording
 				console.log('filename: ', filename_date);
 				latestimage = '/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg';
 				var usbPath = '/dev/bus/usb/' + usbport[1] + '/' + usbport[2];
-				fs.writeFileSync('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data, function (err) {
+				fs.writeFile('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data, (err) => {
 					if (err) {			//handle file system errors
 						console.log('Error writing file, ', err);
 					} else {
@@ -111,21 +112,30 @@ app.post('/', function (req, res) { //this starts recording
 
 						if (fileSizeInBytes < 1000) {
 
-							fs.unlink()
+							fs.unlink('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', (err) => {
+								if (err) throw err;
+								console.log('successfully deleted ', filename_date);
+							  });
 
 							exec('usbreset ' + usbPath, function (err, stdout, stderr) {
 
-								console.log('stdout: ' + stdout);
-								console.log('stderr: ' + stderr);
+								if (stderr || stdout) {
+									console.log('stdout: ' + stdout);
+									console.log('stderr: ' + stderr);
+								}
 
-								if (err !== null) {
-
+								else if (err !== null) {
 									// crash if we can't get going again
-									console.log('exec error: ' + err);
+									console.log('usbreset exec error: ' + err);
 
 								}
+
+								else {
+									console.log("usbreset successfull");
+								}
+
 							});
-						}
+						};
 					}
 				});
 
@@ -160,4 +170,4 @@ app.post('/stop', function (req, res) {
 app.listen(port);
 console.log('Server started on port ' + port);
 
-module.exports = app;
+module.exports = app; 

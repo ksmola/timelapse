@@ -74,7 +74,7 @@ app.post('/', function (req, res) { //this starts recording
 	message = 'Recording Active! Interval: ' + interval + ' s';
 	if (typeof camera !== 'undefined' && camera.length > 0) {
 		function getPicture() {
-			camera[0].takePicture({ download: true }, function (er, data) {
+			camera[0].takePicture({ download: true, keep: true }, function (er, data) {
 
 				dateObj = new Date(); // get new date
 				var filename_year = dateObj.getUTCFullYear();

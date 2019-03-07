@@ -16,10 +16,11 @@ var dateObj = new Date();
 
 let camera = undefined;
 
-let message = undefined;
-let interval = undefined;
-let intervalID = undefined;
-let lastimage = undefined;
+var usbport = undefined;
+var message = undefined;
+var interval = undefined;
+var intervalID = undefined;
+var latestimage = undefined;
 
 GPhoto.setLogLevel(1);
 GPhoto.on('log', function (level, domain, message) {
@@ -54,8 +55,8 @@ app.get('/', function (req, res) {
 	res.render('index', {
 		cameras: camera,
 		message: message,
-		interval: interval
-		image: lastimage
+		interval: interval,
+		image: latestimage
 	});
 });
 
@@ -67,6 +68,8 @@ app.post('/', function (req, res) { //this starts recording
 		interval = 5;
 	}
 	console.log(typeof camera);
+	usbport = camera[0].port.match(/usb:([0-9]+),([0-9]+)/);
+	console.log('Camera USB port: ' + usbport + '\n');
 	message = 'Recording Active! Interval: ' + interval + ' s';
 	if (typeof camera !== 'undefined' && camera.length > 0) {
 		function getPicture() {
@@ -96,8 +99,36 @@ app.post('/', function (req, res) { //this starts recording
 				};
 				var filename_date = `${filename_year}${filename_month}${filename_day}${filename_hour}${filename_min}${filename_sec}`;
 				console.log('filename: ', filename_date);
-				fs.writeFileSync('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data); //TODO make this a dropdown menu
-				lastimage = '/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg';
+				latestimage = '/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg';
+				var usbPath = '/dev/bus/usb/' + usbport[1] + '/' + usbport[2];
+				fs.writeFileSync('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data, function (err) {
+					if (err) {			//handle file system errors
+						console.log('Error writing file, ', err);
+					} else {
+						var fileSizeInBytes = fs.statSync(latestimage)["size"];
+						var fileSizeInMegabytes = fileSizeInBytes / 1000000.0;
+						console.log('Size of ' + filename_date + ': ' + fileSizeInMegabytes + 'mb');
+
+						if (fileSizeInBytes < 1000) {
+
+							fs.unlink()
+
+							exec('usbreset ' + usbPath, function (err, stdout, stderr) {
+
+								console.log('stdout: ' + stdout);
+								console.log('stderr: ' + stderr);
+
+								if (err !== null) {
+
+									// crash if we can't get going again
+									console.log('exec error: ' + err);
+
+								}
+							});
+						}
+					}
+				});
+
 			});
 		};
 		intervalID = setInterval(() => getPicture(), interval * 1000); //TODO limit interval to 4 seconds? 
@@ -108,8 +139,8 @@ app.post('/', function (req, res) { //this starts recording
 	res.render('index', {
 		message: message,
 		interval: interval,
-		cameras: camera, 
-		image: lastimage
+		cameras: camera,
+		image: latestimage
 	});
 });
 

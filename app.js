@@ -169,6 +169,26 @@ app.post('/stop', function (req, res) {
 	});
 });
 
+app.get('/reboot', function (req, res) {
+	console.log('reboot');
+	exec('sudo reboot ', function (err, stdout, stderr) {
+
+		if (stderr || stdout) {
+			console.log('stdout: ' + stdout);
+			console.log('stderr: ' + stderr);
+		}
+
+		else if (err !== null) {
+			// crash if we can't get going again
+		}
+
+		else {
+			console.log("rebooting...");
+		}
+
+	});
+});
+
 
 app.listen(port);
 console.log('Server started on port ' + port);

@@ -21,7 +21,7 @@ html(lang='en')
       label(for='cameralist') Choose your camera
       select(name="cameralist").form-control
         if cameras
-          option= 'cameras[0].model'
+          option=cameras[0].model
         else
           option='no cameras found'
       label.mt-3(for='interval') Interval

@@ -205,8 +205,8 @@ app.get('/download', function (req, res) {
 		}
 	}
 	var os = new os_func();
-	os.execCommand('zip download-images.zip /media/pi/AVS/timelapse_photos/', function (returnvalue) {
-		res.download('download-images.zip')
+	os.execCommand('cd /media/pi/AVS/ && tar cvfz download-images.tar.gz ./timelapse_photos/', function (returnvalue) {
+		res.download('/media/pi/AVS/download-images.tar.gz')
 	});
 
 });

@@ -14,13 +14,13 @@ html(lang='en')
     .alert.alert-success #{message} 
   if error
     .alert.alert-danger #{error}
-  .text-center.form-control
+  .text-center.form-control.p-3
     form(action='/', method="POST")
-      h1.h3.mb-3.font-weight-normal.text-center Timelapse
+      h1.h3.mb-3.font-weight-normal.text-center Timelapse Control
       br
       label(for='cameralist') Choose your camera
       select(name="cameralist").form-control
-        if cameras
+        if cameras != 0
           option=cameras[0].model
         else
           option='no cameras found'
@@ -30,8 +30,10 @@ html(lang='en')
       button.btn.btn-dark(type='submit') Start 
     form(action='/stop', method="POST")
       button.btn.btn-danger.mt-2(type='submit') Stop
-    if image
-      img.text-center.form-control.image(src=image)
+  if image
+    .text-center.form-control.p-3.mt-4.mb-5
+      h3.font-weight-normal Last image
+      img.noborder.form-control.text-center.image.mt-3.p-3(src=image)
 
 
 

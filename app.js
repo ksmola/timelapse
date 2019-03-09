@@ -15,13 +15,14 @@ var app = express();
 
 var dateObj = new Date();
 
-let camera = undefined;
+var camera = undefined;
 
 var usbport = undefined;
 var message = undefined;
 var interval = undefined;
 var intervalID = undefined;
 var latestimage = undefined;
+var linkedpath = undefined;
 
 GPhoto.setLogLevel(1);
 GPhoto.on('log', function (level, domain, message) {
@@ -57,7 +58,7 @@ app.get('/', function (req, res) {
 		cameras: camera,
 		message: message,
 		interval: interval,
-		image: latestimage
+		image: linkedpath
 	});
 });
 
@@ -75,9 +76,9 @@ app.post('/', function (req, res) { //this starts recording
 	if (typeof camera !== 'undefined' && camera.length > 0) {
 		function getPicture() {
 			camera[0].takePicture({
-				download: true, 
+				download: true,
 				keep: true
-			 }, function (er, data) {
+			}, function (er, data) {
 
 				dateObj = new Date(); // get new date
 				var filename_year = dateObj.getUTCFullYear();
@@ -104,6 +105,7 @@ app.post('/', function (req, res) { //this starts recording
 				var filename_date = `${filename_year}${filename_month}${filename_day}${filename_hour}${filename_min}${filename_sec}`;
 				console.log('filename: ', filename_date);
 				latestimage = '/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg';
+				linkedpath = 'timelapse_photos/' + filename_date + '.jpg';
 				var usbPath = '/dev/bus/usb/' + usbport[1] + '/' + usbport[2];
 				fs.writeFile('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', data, (err) => {
 					if (err) {			//handle file system errors
@@ -118,7 +120,7 @@ app.post('/', function (req, res) { //this starts recording
 							fs.unlink('/media/pi/AVS/timelapse_photos/' + filename_date + '.jpg', (err) => {
 								if (err) throw err;
 								console.log('successfully deleted ', filename_date);
-							  });
+							});
 
 							exec('usbreset ' + usbPath, function (err, stdout, stderr) {
 
@@ -153,7 +155,7 @@ app.post('/', function (req, res) { //this starts recording
 		message: message,
 		interval: interval,
 		cameras: camera,
-		image: latestimage
+		image: linkedpath
 	});
 });
 
@@ -187,6 +189,26 @@ app.get('/reboot', function (req, res) {
 		}
 
 	});
+});
+
+app.get('/download', function (req, res) {
+	console.log('generating .zip');
+	function os_func() {
+		this.execCommand = function (cmd, callback) {
+			exec(cmd, (error, stdout, stderr) => {
+				if (error) {
+					console.error(`exec error: ${error}`);
+					return;
+				}
+				callback(stdout);
+			});
+		}
+	}
+	var os = new os_func();
+	os.execCommand('zip download-images.zip /media/pi/AVS/timelapse_photos/', function (returnvalue) {
+		res.download('download-images.zip')
+	});
+
 });
 
 

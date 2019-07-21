@@ -7,6 +7,8 @@ html(lang='en')
     // Bootstrap CSS
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css', integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm', crossorigin='anonymous')
     link(rel='stylesheet', href='style.css')
+    // Google Fonts
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=DM+Serif+Display&display=swap')
 
     title timelapse
   body.container
@@ -16,7 +18,7 @@ html(lang='en')
     .alert.alert-danger #{error}
   .text-center.form-control.p-3
     form(action='/', method="POST")
-      h1.h3.mb-3.font-weight-normal.text-center Timelapse Control
+      h1.mb-3.text-center Timelapse Control
       br
       label(for='cameralist') Choose your camera
       select(name="cameralist").form-control
@@ -27,7 +29,10 @@ html(lang='en')
       label.mt-3(for='interval') Interval
         input.form-control.text-center.w-50.mx-auto(name='interval', type='number', placeholder='Seconds')
       br
-      button.btn.btn-dark(type='submit') Start 
+      if cameras != 0
+          button.btn.btn-dark(type='submit') Start 
+      else
+          button.btn.btn-dark(disabled='disabled') Start 
     form(action='/stop', method="POST")
       button.btn.btn-danger.mt-2(type='submit') Stop
   if image
